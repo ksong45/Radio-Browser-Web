@@ -7,9 +7,7 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-const DISTANCE_THRESHOLD = 50;
-
-// CALCULATE DISTANCE HELPER FUNCTION
+/* // CALCULATE DISTANCE HELPER FUNCTION
 function calculateDistanceMiles(lat1, lon1, lat2, lon2) {
   const R = 3958.8; // Earth radius in miles
 
@@ -28,20 +26,22 @@ function calculateDistanceMiles(lat1, lon1, lat2, lon2) {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   return R * c;
-}
+} */
 
 // Test endpoint
 app.get("/stations", async (req, res) => {
   try {
     const userLat = parseFloat(req.query.lat);
     const userLon = parseFloat(req.query.lon);
+    let radiusMiles = parseFloat(req.query.radius) || 50;
 
     if (isNaN(userLat) || isNaN(userLon)) {
       return res.status(400).json({ error: "Invalid latitude or longitude" });
     }
 
-    const rbUrl = "https://de2.api.radio-browser.info/json/stations/topclick/1000";
-
+    const radius = radiusMiles * 1609.34;
+    const rbUrl = `https://de2.api.radio-browser.info/json/stations/search?geo_lat=${userLat}&geo_long=${userLon}&geo_distance=${radius}`;
+    
     const response = await fetch(rbUrl, {
       headers: {
         "User-Agent": "radio-browser-web/0.1"
@@ -50,7 +50,9 @@ app.get("/stations", async (req, res) => {
 
     const data = await response.json();
 
-    const geoStations = data.filter(
+    data.sort((a, b) => a.geo_distance - b.geo_distance);
+
+    /* const geoStations = data.filter(
       (station) => station.geo_lat !== null && station.geo_long !== null
     );
 
@@ -72,20 +74,31 @@ app.get("/stations", async (req, res) => {
           distance
         };
       })
-      .filter((station) => station.distance <= DISTANCE_THRESHOLD);
+      .filter((station) => station.distance <= radius);
 
     nearbyStations.sort((a, b) => a.distance - b.distance);
 
-    //console.log("Radio Browser data:", data);
+    // remove duplicates
+    const uniqueStationsMap = new Map();
 
-    const stations = nearbyStations.map((station) => ({
+    nearbyStations.forEach((station) => {
+      if (!uniqueStationsMap.has(station.stationuuid)) {
+        uniqueStationsMap.set(station.stationuuid, station);
+      }
+    });
+
+    const uniqueNearbyStations = Array.from(uniqueStationsMap.values());
+
+    //console.log("Radio Browser data:", data); */
+
+    const stations = data.map((station) => ({
       name: station.name,
       url: station.url_resolved || station.url,
       favicon: station.favicon,
       genre: station.tags,
       state: station.state,
       country: station.country,
-      distance: station.distance
+      distanceMiles: station.geo_distance / 1609.34
     }));
 
     res.json({

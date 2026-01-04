@@ -2,9 +2,11 @@ async function loadStations() {
   try {
     const lat = parseFloat(document.getElementById("lat").value);
     const lon = parseFloat(document.getElementById("lon").value);
+    const radiusInput = document.getElementById("radius").value;
+    const radius = parseFloat(radiusInput) || 50;
 
     const response = await fetch(
-      `http://localhost:3000/stations?lat=${lat}&lon=${lon}`
+      `http://localhost:3000/stations?lat=${lat}&lon=${lon}&radius=${radius}`
     );
 
     const data = await response.json();
@@ -29,7 +31,7 @@ async function loadStations() {
         li.textContent = station.name;
       }
 
-      li.append(` | ${location} | ${station.distance.toFixed(2)} miles`);
+      li.append(` | ${location} | ${station.distanceMiles.toFixed(2)} miles | ${station.genre}`);
 
       list.appendChild(li);
     });
