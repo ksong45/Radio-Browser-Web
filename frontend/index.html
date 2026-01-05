@@ -1,54 +1,80 @@
 <!DOCTYPE html>
 <html>
-  <head></head>
+  <head>
+    <link rel="stylesheet" href="styles.css">
+  </head>
   <body>
     <h1>Nearby Radio Stations</h1>
 
-    <label>
-      Latitude:
-      <input id="lat" type="number" step="any" value="40.7128">
-    </label>
+    <div>
+      <label>
+        Latitude:
+        <input id="lat" type="number" step="any" value="40.7128">
+      </label>
 
-    <label>
-      Longitude:
-      <input id="lon" type="number" step="any" value="-74.0060">
-    </label>
+      <label>
+        Longitude:
+        <input id="lon" type="number" step="any" value="-74.0060">
+      </label>
 
-    <label>
-      Radius (miles):
-      <input
-        id="radius"
-        type="number"
-        min="1"
-        max="500"
-        step="1"
-        value="50"
-      />
-    </label>
+      <button id="live-location">Use Live Location</button>
 
-    <label>
-      Genre
-      <select id="genre">
-        <option value="">All Genres</option>
-        <option value="pop">Pop</option>
-        <option value="rock">Rock</option>
-        <option value="jazz">Jazz</option>
-        <option value="classical">Classical</option>
-        <option value="electronic">Electronic</option>
-        <option value="hiphop">Hip Hop / R&B</option>
-        <option value="country">Country</option>
-        <option value="oldies">Oldies & Decades</option>
-        <option value="talk">Talk / News</option>
-        <option value="religious">Christian & Religious</option>
-        <option value="world">World / International</option>
-        <option value="ambient">Ambient / Chill</option>
-        <option value="college">College / Community</option>
-      </select>
-    </label>
+      <label>
+        Radius (miles):
+        <input
+          id="radius"
+          type="number"
+          min="1"
+          max="500"
+          step="1"
+          value="50"
+        />
+      </label>
+    </div>
 
-    <button id="search">Find Stations</button>
+    <!-- <div>
+      <label>
+        Genre
+        <select id="genre">
+          <option value="">All Genres</option>
+          <option value="pop">Pop</option>
+          <option value="rock">Rock</option>
+          <option value="jazz">Jazz</option>
+          <option value="classical">Classical</option>
+          <option value="electronic">Electronic</option>
+          <option value="hiphop">Hip Hop / R&B</option>
+          <option value="country">Country</option>
+          <option value="oldies">Oldies & Decades</option>
+          <option value="talk">Talk / News</option>
+          <option value="religious">Christian & Religious</option>
+          <option value="world">World / International</option>
+          <option value="ambient">Ambient / Chill</option>
+          <option value="college">College / Community</option>
+        </select>
+      </label>
+    </div> -->
 
-    <button id="live-location">Use Live Location</button>
+    <div id="genre-chips">
+      <span class="label">Genres (optional)</span>
+
+      <button class="genre-chip" data-genre="pop">Pop</button>
+      <button class="genre-chip" data-genre="rock">Rock</button>
+      <button class="genre-chip" data-genre="jazz">Jazz</button>
+      <button class="genre-chip" data-genre="classical">Classical</button>
+      <button class="genre-chip" data-genre="electronic">Electronic</button>
+      <button class="genre-chip" data-genre="hiphop">Hip Hop / R&B</button>
+      <button class="genre-chip" data-genre="country">Country</button>
+      <button class="genre-chip" data-genre="oldies">Oldies & Decades</button>
+      <button class="genre-chip" data-genre="talk">Talk / News</button>
+      <button class="genre-chip" data-genre="religious">Christian & Religious</button>
+      <button class="genre-chip" data-genre="world">World / International</button>
+      <button class="genre-chip" data-genre="ambient">Ambient / Chill</button>
+      <button class="genre-chip" data-genre="college">College / Community</button>
+    </div>
+
+    <div>
+      <button id="search">Find Stations</button>
+    </div>
 
     <ul id="stations"></ul>
 

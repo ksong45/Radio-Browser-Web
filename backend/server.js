@@ -19,6 +19,20 @@ function stationMatchesGenre(station, genreKey, buckets) {
   return subterms.some(term => tags.includes(term));
 }
 
+// NEW HELPER
+function stationMatchesAnyGenre(station, genreKeys, buckets) {
+  if (!genreKeys || genreKeys.length === 0) return false;
+
+  const tags = (station.tags || "").toLowerCase();
+
+  return genreKeys.some((genreKey) => {
+    const subterms = buckets[genreKey];
+    if (!subterms) return false;
+
+    return subterms.some(term => tags.includes(term));
+  });
+}
+
 // Test endpoint
 app.get("/stations", async (req, res) => {
   try {
@@ -118,7 +132,10 @@ app.get("/stations", async (req, res) => {
     const userLat = parseFloat(req.query.lat);
     const userLon = parseFloat(req.query.lon);
     let radiusMiles = parseFloat(req.query.radius) || 50;
-    const genre = req.query.genre || "";
+    //const genre = req.query.genre || "";
+    const selectedGenres = req.query.genres
+      ? req.query.genres.split(",")
+      : [];
 
     if (isNaN(userLat) || isNaN(userLon)) {
       return res.status(400).json({ error: "Invalid latitude or longitude" });
@@ -162,7 +179,7 @@ app.get("/stations", async (req, res) => {
     let nonMatching = [];
 
     uniqueStations.forEach((station) => {
-      if (stationMatchesGenre(station, genre, GENRE_BUCKETS)) {
+      if (stationMatchesAnyGenre(station, selectedGenres, GENRE_BUCKETS)) {
         matching.push(station);
       } else {
         nonMatching.push(station);
@@ -172,17 +189,23 @@ app.get("/stations", async (req, res) => {
     matching.sort((a, b) => a.geo_distance - b.geo_distance);
     nonMatching.sort((a, b) => a.geo_distance - b.geo_distance);
 
-    const orderedStations = genre
+    /* const orderedStations = genre
+      ? [...matching, ...nonMatching]
+      : [...uniqueStations].sort(
+          (a, b) => a.geo_distance - b.geo_distance
+        ); */
+
+    const orderedStations = selectedGenres.length > 0
       ? [...matching, ...nonMatching]
       : [...uniqueStations].sort(
           (a, b) => a.geo_distance - b.geo_distance
         );
-    /* console.log("Stations sent to frontend (FULL OBJECTS):");
+    console.log("Stations sent to frontend (FULL OBJECTS):");
 
     uniqueStations.forEach((station, i) => {
       console.log(`\n--- Station ${i + 1} ---`);
       console.log(station);
-    }); */
+    });
 
     const stations = orderedStations.map((station) => ({
       name: station.name,
@@ -193,8 +216,12 @@ app.get("/stations", async (req, res) => {
       country: station.country,
       distanceMiles: station.geo_distance / 1609.34,
       // ADDED
-      matchesGenre: genre
+      /* matchesGenre: genre
           ? stationMatchesGenre(station, genre, GENRE_BUCKETS)
+          : false */
+      matchesGenre:
+        selectedGenres.length > 0
+          ? stationMatchesAnyGenre(station, selectedGenres, GENRE_BUCKETS)
           : false
     }));
 

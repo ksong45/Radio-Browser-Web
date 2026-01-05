@@ -1,0 +1,19 @@
+.genre-chip {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 6px 10px;
+  border-radius: 16px;
+  border: 1px solid #ccc;
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+.genre-chip:hover {
+  background-color: #e0ffff;
+}
+
+.genre-chip.active {
+  background-color: aqua;
+  color: black;
+  border-color: #00bcd4;
+}
