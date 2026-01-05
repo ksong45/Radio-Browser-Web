@@ -7,33 +7,118 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-/* // CALCULATE DISTANCE HELPER FUNCTION
-function calculateDistanceMiles(lat1, lon1, lat2, lon2) {
-  const R = 3958.8; // Earth radius in miles
+// HELPER
+function stationMatchesGenre(station, genreKey, buckets) {
+  if (!genreKey) return false;
 
-  const toRadians = (deg) => deg * (Math.PI / 180);
+  const tags = (station.tags || "").toLowerCase();
+  const subterms = buckets[genreKey];
 
-  const dLat = toRadians(lat2 - lat1);
-  const dLon = toRadians(lon2 - lon1);
+  if (!subterms) return false;
 
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(lat1)) *
-      Math.cos(toRadians(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return R * c;
-} */
+  return subterms.some(term => tags.includes(term));
+}
 
 // Test endpoint
 app.get("/stations", async (req, res) => {
   try {
+    const GENRE_BUCKETS = {
+      jazz: [
+        "jazz",
+        "smooth jazz",
+        "cool jazz",
+        "bebop",
+        "big band",
+        "fusion",
+        "nu-jazz",
+        "latin jazz"
+      ],
+
+      rock: [
+        "rock",
+        "classic rock",
+        "hard rock",
+        "alternative",
+        "metal",
+        "punk",
+        "indie rock",
+        "progressive rock"
+      ],
+
+      pop: [
+        "pop",
+        "top 40",
+        "hot adult contemporary",
+        "hot ac",
+        "adult contemporary",
+        "hits"
+      ],
+
+      hiphop: [
+        "hip hop",
+        "hip-hop",
+        "rap",
+        "r&b",
+        "trap"
+      ],
+
+      electronic: [
+        "electronic",
+        "house",
+        "deep house",
+        "techno",
+        "trance",
+        "ambient",
+        "edm"
+      ],
+
+      classical: [
+        "classical",
+        "orchestral",
+        "symphony",
+        "opera",
+        "baroque",
+        "chamber"
+      ],
+
+      country: [
+        "country",
+        "classic country",
+        "new country",
+        "americana",
+        "bluegrass"
+      ],
+
+      oldies: [
+        "oldies",
+        "50s",
+        "60s",
+        "70s",
+        "80s",
+        "90s",
+        "classic hits"
+      ],
+
+      reggae: [
+        "reggae",
+        "dancehall",
+        "ska",
+        "soca",
+        "calypso"
+      ],
+
+      talk: [
+        "talk",
+        "news",
+        "public radio",
+        "npr"
+      ]
+    };
+
     const userLat = parseFloat(req.query.lat);
     const userLon = parseFloat(req.query.lon);
     let radiusMiles = parseFloat(req.query.radius) || 50;
+    const genre = req.query.genre || "";
 
     if (isNaN(userLat) || isNaN(userLon)) {
       return res.status(400).json({ error: "Invalid latitude or longitude" });
@@ -50,55 +135,67 @@ app.get("/stations", async (req, res) => {
 
     const data = await response.json();
 
-    data.sort((a, b) => a.geo_distance - b.geo_distance);
+    const streamMap = new Map();
 
-    /* const geoStations = data.filter(
-      (station) => station.geo_lat !== null && station.geo_long !== null
-    );
+    data.forEach((station) => {
+      const streamKey = station.url_resolved || station.url;
+      if (!streamKey) return;
 
-    console.log(
-      `Stations total: ${data.length}, with geo: ${geoStations.length}`
-    );
+      if (!streamMap.has(streamKey)) {
+        streamMap.set(streamKey, station);
+      } else {
+        const existing = streamMap.get(streamKey);
 
-    const nearbyStations = geoStations
-      .map((station) => {
-        const distance = calculateDistanceMiles(
-          userLat,
-          userLon,
-          station.geo_lat,
-          station.geo_long
-        );
-
-        return {
-          ...station,
-          distance
-        };
-      })
-      .filter((station) => station.distance <= radius);
-
-    nearbyStations.sort((a, b) => a.distance - b.distance);
-
-    // remove duplicates
-    const uniqueStationsMap = new Map();
-
-    nearbyStations.forEach((station) => {
-      if (!uniqueStationsMap.has(station.stationuuid)) {
-        uniqueStationsMap.set(station.stationuuid, station);
+        // Keep the better entry
+        if ((station.votes || 0) > (existing.votes || 0)) {
+          streamMap.set(streamKey, station);
+        }
       }
     });
 
-    const uniqueNearbyStations = Array.from(uniqueStationsMap.values());
+    const uniqueStations = Array.from(streamMap.values());
 
-    //console.log("Radio Browser data:", data); */
+    // data.sort((a, b) => a.geo_distance - b.geo_distance);
 
-    const stations = data.map((station) => ({
+    // genre
+    let matching = [];
+    let nonMatching = [];
+
+    uniqueStations.forEach((station) => {
+      if (stationMatchesGenre(station, genre, GENRE_BUCKETS)) {
+        matching.push(station);
+      } else {
+        nonMatching.push(station);
+      }
+    });
+
+    matching.sort((a, b) => a.geo_distance - b.geo_distance);
+    nonMatching.sort((a, b) => a.geo_distance - b.geo_distance);
+
+    const orderedStations = genre
+      ? [...matching, ...nonMatching]
+      : [...uniqueStations].sort(
+          (a, b) => a.geo_distance - b.geo_distance
+        );
+    /* console.log("Stations sent to frontend (FULL OBJECTS):");
+
+    uniqueStations.forEach((station, i) => {
+      console.log(`\n--- Station ${i + 1} ---`);
+      console.log(station);
+    }); */
+
+    const stations = orderedStations.map((station) => ({
       name: station.name,
       url: station.url_resolved || station.url,
       favicon: station.favicon,
       genre: station.tags,
       state: station.state,
       country: station.country,
-      distanceMiles: station.geo_distance / 1609.34
+      distanceMiles: station.geo_distance / 1609.34,
+      // ADDED
+      matchesGenre: genre
+          ? stationMatchesGenre(station, genre, GENRE_BUCKETS)
+          : false
     }));
 
     res.json({
