@@ -2,6 +2,16 @@
 <html>
   <head>
     <link rel="stylesheet" href="styles.css">
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      defer
+    ></script>
   </head>
   <body>
     <h1>Nearby Radio Stations</h1>
@@ -32,28 +42,6 @@
       </label>
     </div>
 
-    <!-- <div>
-      <label>
-        Genre
-        <select id="genre">
-          <option value="">All Genres</option>
-          <option value="pop">Pop</option>
-          <option value="rock">Rock</option>
-          <option value="jazz">Jazz</option>
-          <option value="classical">Classical</option>
-          <option value="electronic">Electronic</option>
-          <option value="hiphop">Hip Hop / R&B</option>
-          <option value="country">Country</option>
-          <option value="oldies">Oldies & Decades</option>
-          <option value="talk">Talk / News</option>
-          <option value="religious">Christian & Religious</option>
-          <option value="world">World / International</option>
-          <option value="ambient">Ambient / Chill</option>
-          <option value="college">College / Community</option>
-        </select>
-      </label>
-    </div> -->
-
     <div id="genre-chips">
       <span class="label">Genres (optional)</span>
 
@@ -76,8 +64,10 @@
       <button id="search">Find Stations</button>
     </div>
 
+    <div id="map"></div>
+
     <ul id="stations"></ul>
 
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
   </body>
 </html>
