@@ -7,18 +7,6 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-// HELPER
-function stationMatchesGenre(station, genreKey, buckets) {
-  if (!genreKey) return false;
-
-  const tags = (station.tags || "").toLowerCase();
-  const subterms = buckets[genreKey];
-
-  if (!subterms) return false;
-
-  return subterms.some(term => tags.includes(term));
-}
-
 // NEW HELPER
 function stationMatchesAnyGenre(station, genreKeys, buckets) {
   if (!genreKeys || genreKeys.length === 0) return false;
@@ -126,13 +114,45 @@ app.get("/stations", async (req, res) => {
         "news",
         "public radio",
         "npr"
+      ],
+
+      religious: [
+        "christian",
+        "religious",
+        "gospel",
+        "worship",
+        "faith"
+      ],
+
+      world: [
+        "world",
+        "international",
+        "latin",
+        "african",
+        "global",
+        "ethnic"
+      ],
+
+      ambient: [
+        "ambient",
+        "chill",
+        "downtempo",
+        "lofi",
+        "lo-fi",
+        "chillout"
+      ],
+
+      college: [
+        "college",
+        "community",
+        "campus",
+        "student"
       ]
     };
 
     const userLat = parseFloat(req.query.lat);
     const userLon = parseFloat(req.query.lon);
     let radiusMiles = parseFloat(req.query.radius) || 50;
-    //const genre = req.query.genre || "";
     const selectedGenres = req.query.genres
       ? req.query.genres.split(",")
       : [];
@@ -172,8 +192,6 @@ app.get("/stations", async (req, res) => {
 
     const uniqueStations = Array.from(streamMap.values());
 
-    // data.sort((a, b) => a.geo_distance - b.geo_distance);
-
     // genre
     let matching = [];
     let nonMatching = [];
@@ -188,12 +206,6 @@ app.get("/stations", async (req, res) => {
 
     matching.sort((a, b) => a.geo_distance - b.geo_distance);
     nonMatching.sort((a, b) => a.geo_distance - b.geo_distance);
-
-    /* const orderedStations = genre
-      ? [...matching, ...nonMatching]
-      : [...uniqueStations].sort(
-          (a, b) => a.geo_distance - b.geo_distance
-        ); */
 
     const orderedStations = selectedGenres.length > 0
       ? [...matching, ...nonMatching]
@@ -214,11 +226,9 @@ app.get("/stations", async (req, res) => {
       genre: station.tags,
       state: station.state,
       country: station.country,
+      lat: station.geo_lat,
+      lon: station.geo_long,
       distanceMiles: station.geo_distance / 1609.34,
-      // ADDED
-      /* matchesGenre: genre
-          ? stationMatchesGenre(station, genre, GENRE_BUCKETS)
-          : false */
       matchesGenre:
         selectedGenres.length > 0
           ? stationMatchesAnyGenre(station, selectedGenres, GENRE_BUCKETS)
