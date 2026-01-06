@@ -1,30 +1,265 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+.lat-label {
+  margin-left: 10px;
+}
+/* =========================
+   Header
+========================= */
+
+.app-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #000000; /* subtle divider */
+  background: rgb(0, 0, 0);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.app-header h1 {
+  margin: 0;
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+
+/* =========================
+   Layout
+========================= */
+
+.layout {
+  display: flex;
+  height: 75vh;
+}
+
+/* Left: station list */
+.left-panel {
+  flex: 1;
+  overflow-y: auto;
+  border-right: 1px solid #000000;
+  border-top: 1px solid #000000;
+  padding-right: 8px;
+  background: #ffffff;
+  padding-left: 10px;
+  border-bottom: 1px solid #000000;
+}
+
+/* Right: map */
+.right-panel {
+  flex: 1.2;
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+}
+
+/* Leaflet map MUST have height */
+#map {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+
+/* =========================
+   Genre Chips
+========================= */
+
+#genre-chips {
+  display: flex;
+  align-items: center;   /* vertical alignment */
+  gap: 12px;             /* space between label and chips */
+  flex-wrap: wrap;       /* wrap chips if screen is small */
+  display: inline-block;
+}
+
 .genre-chip {
-  appearance: none;
-  -webkit-appearance: none;
-  padding: 6px 10px;
-  border-radius: 16px;
-  border: 1px solid #ccc;
-  background-color: #f5f5f5;
+  padding: 5px 10px;          /* ↓ smaller pill */
+  font-size: 0.8rem;          /* ↓ text size */
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #111827;
   cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-block;
+  font-weight: 500;
 }
 
 .genre-chip:hover {
-  background-color: #e0ffff;
+  background: #eef2ff;
+  border-color: #d2d2d2;
 }
 
 .genre-chip.active {
-  background-color: aqua;
-  color: black;
-  border-color: #00bcd4;
+  background: #5a83ff;
+  color: white;
+  border-color: #5a83ff;
 }
 
-#map {
-  width: 100%;
-  height: 300px;
-  margin: 16px 0;
-}
+
+/* =========================
+   Station List
+========================= */
 
 #stations li.active {
-  background: rgba(0, 150, 255, 0.15);
-  border-left: 4px solid #0096ff;
+  background: #bfcfff79;
+  border-left: 4px solid #5a83ff;
+}
+
+
+/* =========================
+   Filter Card
+========================= */
+
+.filter-card {
+  background: white;
+  border-radius: 14px;
+  padding-bottom: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  max-width: 100%;
+}
+
+.filter-card h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.filter-subtitle {
+  margin: 4px 0 16px;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+
+/* =========================
+   Location Inputs
+========================= */
+
+.location-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 5px;
+  flex-wrap: wrap;
+}
+
+.location-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.location-group.small input {
+  width: 80px;
+}
+
+.location-group label {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.location-group input {
+  width: 100px;
+  padding: 5px 8px;          /* ↓ match chip height */
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  font-size: 0.8rem;         /* ↓ same as chips */
+}
+
+.location-group input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+
+/* =========================
+   Buttons
+========================= */
+
+.primary-btn,
+.ghost-btn {
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.primary-btn {
+  background: #000000;
+  color: white;
+  border: none;
+  font-weight: bold;
+}
+
+.primary-btn:hover {
+  background: #151515db;
+}
+
+.ghost-btn {
+  background: transparent;
+  border: 1px solid #e5e7eb;
+}
+
+.ghost-btn:hover {
+  background: #eef2ff;
+  border-color: #d2d2d2;
+}
+
+.loc-icon {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+/* =========================
+   Labels
+========================= */
+
+.music-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+  white-space: nowrap;  /* prevent breaking onto new line */
+  display: inline-block;
+  margin-left: 10px;
+}
+
+#stations {
+  list-style: none;
+  padding-left: 0;
+}
+
+#stations li.header {
+  list-style: none;
+  padding-left: 0;
+}
+
+.list-footer {
+  height: 43.5px;
+  background: #3265ff;
+}
+
+.station-distance {
+  color: #000000;   /* pure black */
+  font-weight: 600; /* optional: makes it stand out */
+}
+
+.section-header {
+  list-style: none;
+  margin: 16px 0 6px;
+  padding-bottom: 6px;
+  font-size: 16;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #000000;
+  border-bottom: 1px solid #e5e7eb;
 }

@@ -29,6 +29,34 @@ function getStationId(station) {
   return btoa(station.url).replace(/=/g, "");
 }
 
+function showListLoading() {
+  const list = document.getElementById("stations");
+  list.innerHTML = "";
+
+  const li = document.createElement("li");
+  li.textContent = "Finding nearby stations…";
+  li.style.padding = "12px";
+  li.style.color = "#6b7280";
+  li.style.fontStyle = "italic";
+  li.style.listStyle = "none";
+
+  list.appendChild(li);
+}
+
+function showEmptyMessage() {
+  const list = document.getElementById("stations");
+  list.innerHTML = "";
+
+  const msg = document.createElement("li");
+  msg.textContent = "Search to find nearby radio stations";
+  msg.style.color = "#6b7280";
+  msg.style.fontStyle = "italic";
+  msg.style.padding = "12px";
+
+  list.appendChild(msg);
+}
+
+
 function initMap(lat, lon, radiusMiles) {
   if (!map) {
     map = L.map("map").setView([lat, lon], 10);
@@ -90,6 +118,7 @@ const selectedGenres = new Set();
 
 async function loadStations() {
   try {
+    showListLoading();
     const lat = parseFloat(document.getElementById("lat").value);
     const lon = parseFloat(document.getElementById("lon").value);
     const radiusInput = document.getElementById("radius").value;
@@ -185,6 +214,7 @@ async function loadStations() {
 
     if (!hasGenres) {
       const header = document.createElement("li");
+      header.className = "section-header";
       header.textContent = "NEARBY STATIONS";
       header.style.fontWeight = "bold";
       header.style.marginTop = "12px";
@@ -202,6 +232,7 @@ async function loadStations() {
 
     if (hasGenres) {
       const header = document.createElement("li");
+      header.className = "section-header";
       header.textContent = "MATCHING GENRES";
       header.style.fontWeight = "bold";
       header.style.marginTop = "12px";
@@ -217,6 +248,7 @@ async function loadStations() {
       }
 
       const otherHeader = document.createElement("li");
+      otherHeader.className = "section-header";
       otherHeader.textContent = "OTHER NEARBY STATIONS";
       otherHeader.style.fontWeight = "bold";
       otherHeader.style.marginTop = "12px";
@@ -271,9 +303,9 @@ function renderStation(station) {
 
   const stationId = getStationId(station);
   li.dataset.stationId = stationId;
-
   listItemById.set(stationId, li);
 
+  /* ---------- List → Map interaction ---------- */
   li.addEventListener("click", () => {
     if (selectedStationId === stationId) {
       clearSelection();
@@ -282,7 +314,6 @@ function renderStation(station) {
 
     clearSelection();
     selectedStationId = stationId;
-
     li.classList.add("active");
 
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -294,59 +325,106 @@ function renderStation(station) {
     }
   });
 
-  // Make the row horizontal
+  /* ---------- Row layout ---------- */
   li.style.display = "flex";
   li.style.alignItems = "center";
-  li.style.gap = "8px";
-  li.style.padding = "6px 0";
+  li.style.justifyContent = "space-between";
+  li.style.padding = "10px 6px";
+  li.style.cursor = "pointer";
 
-  // Favicon
+  /* ---------- Left side ---------- */
+  const left = document.createElement("div");
+  left.style.display = "flex";
+  left.style.alignItems = "center";
+  left.style.gap = "10px";
+
+  /* ---------- Favicon ---------- */
   const img = document.createElement("img");
   img.src = station.favicon || "default_radio.png";
+  img.onerror = () => (img.src = "default_radio.png");
 
-  img.onerror = () => {
-    img.src = "default_radio.png";
-  };
-
-  img.style.width = "28px";
-  img.style.height = "28px";
+  img.style.width = "32px";
+  img.style.height = "32px";
   img.style.objectFit = "contain";
-  img.style.borderRadius = "4px";
+  img.style.borderRadius = "6px";
   img.style.background = "#eee";
 
-  li.appendChild(img);
+  left.appendChild(img);
 
-  // Text container
-  const text = document.createElement("span");
+  /* ---------- Text stack ---------- */
+  const text = document.createElement("div");
+  text.style.display = "flex";
+  text.style.flexDirection = "column";
+  text.style.gap = "2px";
+
+  /* ---------- Station name (ONLY clickable link) ---------- */
+  const name = document.createElement("a");
+  name.textContent = station.name;
+  name.href = station.url;
+  name.target = "_blank";
+
+  name.style.fontSize = "0.95rem";
+  name.style.fontWeight = "600";
+  name.style.color = "#111827";
+  name.style.textDecoration = "none";
+  name.style.cursor = "pointer";
+
+  name.addEventListener("mouseenter", () => {
+    name.style.textDecoration = "underline";
+  });
+
+  name.addEventListener("mouseleave", () => {
+    name.style.textDecoration = "none";
+  });
+
+  // 🔑 prevent map interaction
+  name.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
+  /* ---------- Meta ---------- */
+  const meta = document.createElement("div");
+  meta.style.fontSize = "0.75rem";
+  meta.style.color = "#6b7280";
 
   const location = station.state
-    ? `(${station.state}, ${station.country})`
-    : `(${station.country})`;
+    ? `${station.state}, ${station.country}`
+    : station.country;
 
-  if (station.url) {
-    const link = document.createElement("a");
-    link.href = station.url;
-    link.textContent = station.name;
-    link.target = "_blank";
-    link.style.fontWeight = "500";
+  meta.textContent = `${location}`;
 
-    // 🔑 IMPORTANT
-    link.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
+  text.appendChild(name);
+  text.appendChild(meta);
+  left.appendChild(text);
 
-    text.appendChild(link);
-  }
+  /* ---------- Distance (RIGHT SIDE) ---------- */
+  const distance = document.createElement("div");
+  distance.className = "station-distance";
+  distance.textContent = `${station.distanceMiles.toFixed(1)} mi`;
+  distance.style.fontSize = "0.9rem";
+  distance.style.fontWeight = "600";
+  distance.style.color = "#374151";
+  distance.style.whiteSpace = "nowrap";
 
-  text.append(
-    ` | ${location} | ${station.distanceMiles.toFixed(2)} miles | ${station.genre}`
-  );
-
-  li.appendChild(text);
+  li.appendChild(left);
+  li.appendChild(distance);
   list.appendChild(li);
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const lat = parseFloat(document.getElementById("lat").value);
+  const lon = parseFloat(document.getElementById("lon").value);
+  const radius = parseFloat(document.getElementById("radius").value) || 50;
+
+  initMap(lat, lon, radius);
+});
+
+showEmptyMessage();
 
 document.getElementById("search").addEventListener("click", loadStations);
 document
   .getElementById("live-location")
   .addEventListener("click", useLiveLocation);
+
+  
