@@ -7,7 +7,7 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-// NEW HELPER
+// does station fit user criteria
 function stationMatchesAnyGenre(station, genreKeys, buckets) {
   if (!genreKeys || genreKeys.length === 0) return false;
 
@@ -21,7 +21,7 @@ function stationMatchesAnyGenre(station, genreKeys, buckets) {
   });
 }
 
-// Test endpoint
+// define genre buckets and subterms
 app.get("/stations", async (req, res) => {
   try {
     const GENRE_BUCKETS = {
@@ -150,6 +150,7 @@ app.get("/stations", async (req, res) => {
       ]
     };
 
+    // inputs
     const userLat = parseFloat(req.query.lat);
     const userLon = parseFloat(req.query.lon);
     let radiusMiles = parseFloat(req.query.radius) || 50;
@@ -157,6 +158,7 @@ app.get("/stations", async (req, res) => {
       ? req.query.genres.split(",")
       : [];
 
+    // handle invalid location input
     if (isNaN(userLat) || isNaN(userLon)) {
       return res.status(400).json({ error: "Invalid latitude or longitude" });
     }
@@ -172,8 +174,10 @@ app.get("/stations", async (req, res) => {
 
     const data = await response.json();
 
+    // after data is received
     const streamMap = new Map();
 
+    // filter for unique stations by URL
     data.forEach((station) => {
       const streamKey = station.url_resolved || station.url;
       if (!streamKey) return;
@@ -183,7 +187,7 @@ app.get("/stations", async (req, res) => {
       } else {
         const existing = streamMap.get(streamKey);
 
-        // Keep the better entry
+        // keep the better entry
         if ((station.votes || 0) > (existing.votes || 0)) {
           streamMap.set(streamKey, station);
         }
@@ -207,6 +211,7 @@ app.get("/stations", async (req, res) => {
     matching.sort((a, b) => a.geo_distance - b.geo_distance);
     nonMatching.sort((a, b) => a.geo_distance - b.geo_distance);
 
+    // merge lists
     const orderedStations = selectedGenres.length > 0
       ? [...matching, ...nonMatching]
       : [...uniqueStations].sort(
@@ -214,11 +219,13 @@ app.get("/stations", async (req, res) => {
         );
     console.log("Stations sent to frontend (FULL OBJECTS):");
 
+    // console print radio profiles
     uniqueStations.forEach((station, i) => {
       console.log(`\n--- Station ${i + 1} ---`);
       console.log(station);
     });
 
+    // return information to the frontend
     const stations = orderedStations.map((station) => ({
       name: station.name,
       url: station.url_resolved || station.url,

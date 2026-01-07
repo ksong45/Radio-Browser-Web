@@ -1,9 +1,10 @@
-// MAPSTUFF
+// global variables for map
 let map;
 let marker;
 let radiusCircle;
 let stationLayer;
 
+// map marker icons
 const matchingIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
@@ -22,13 +23,25 @@ const defaultIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
+// maps matching id to a marker or list item
 const markerById = new Map();
 const listItemById = new Map();
+
+// currently selected station (null = none)
+let selectedStationId = null;
+
+// store genres selected by user
+const selectedGenres = new Set();
+
+// =========================
+// Helper Functions
+// =========================
 
 function getStationId(station) {
   return btoa(station.url).replace(/=/g, "");
 }
 
+// display message when searching
 function showListLoading() {
   const list = document.getElementById("stations");
   list.innerHTML = "";
@@ -43,6 +56,7 @@ function showListLoading() {
   list.appendChild(li);
 }
 
+// display message when list is empty
 function showEmptyMessage() {
   const list = document.getElementById("stations");
   list.innerHTML = "";
@@ -56,9 +70,10 @@ function showEmptyMessage() {
   list.appendChild(msg);
 }
 
-
+// initialize or update the map using a location and radius
 function initMap(lat, lon, radiusMiles) {
   if (!map) {
+    // default view
     map = L.map("map").setView([lat, lon], 10);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -67,7 +82,7 @@ function initMap(lat, lon, radiusMiles) {
 
     stationLayer = L.layerGroup().addTo(map);
 
-    // click empty map → clear selection
+    // click empty map > clear selection
     map.on("click", clearSelection);
   }
 
@@ -82,17 +97,14 @@ function initMap(lat, lon, radiusMiles) {
     fillOpacity: 0.15
   }).addTo(map);
 
-  // ✅ ZOOM HERE — once per search
+  // zoom once per search
   map.fitBounds(radiusCircle.getBounds(), {
     padding: [40, 40],
     animate: true
   });
 }
 
-// MAPSTUFF
-
-let selectedStationId = null;
-
+// remove all selections
 function clearSelection() {
   selectedStationId = null;
   document
@@ -100,25 +112,12 @@ function clearSelection() {
     .forEach(el => el.classList.remove("active"));
 }
 
-const selectedGenres = new Set();
-
-    document.querySelectorAll(".genre-chip").forEach((chip) => {
-      chip.addEventListener("click", () => {
-        const genre = chip.dataset.genre;
-
-        if (selectedGenres.has(genre)) {
-          selectedGenres.delete(genre);
-          chip.classList.remove("active");
-        } else {
-          selectedGenres.add(genre);
-          chip.classList.add("active");
-        }
-      });
-    });
-
+// communicate with backend and display station list
 async function loadStations() {
   try {
     showListLoading();
+
+    // handle inputs
     const lat = parseFloat(document.getElementById("lat").value);
     const lon = parseFloat(document.getElementById("lon").value);
     const radiusInput = document.getElementById("radius").value;
@@ -127,22 +126,23 @@ async function loadStations() {
     const genres = Array.from(selectedGenres);
     const genreParam = genres.join(",");
 
-    // MAPSTUFF
+    // update map
     initMap(lat, lon, radius);
 
+    // backend
     const response = await fetch(
       `http://localhost:3000/stations?lat=${lat}&lon=${lon}&radius=${radius}&genres=${genreParam}`
     );
 
     const data = await response.json();
 
+    // clear
     markerById.clear();
     listItemById.clear();
     clearSelection();
-
-    // MAPSTUFF
     stationLayer.clearLayers();
 
+    // marker logic
     data.stations.forEach((station) => {
       if (!station.lat || !station.lon) return;
 
@@ -152,6 +152,7 @@ async function loadStations() {
 
       const pin = L.marker([station.lat, station.lon], { icon });
 
+      // marker description box
       pin.bindPopup(`
         <strong>${station.name}</strong><br/>
         ${station.state ? station.state + ", " : ""}${station.country}<br/>
@@ -161,19 +162,19 @@ async function loadStations() {
 
       markerById.set(stationId, pin);
 
-      // Hover → show info
+      // hover > show info
       pin.on("mouseover", () => {
         pin.openPopup();
       });
 
-      // Mouse out → hide info
+      // mouse out > hide info
       pin.on("mouseout", () => {
         if (selectedStationId !== stationId) {
           pin.closePopup();
         }
       });
 
-      // Click → selection behavior (keep your existing logic)
+      // click > selection behavior
       pin.on("click", () => {
         if (selectedStationId === stationId) {
           clearSelection();
@@ -193,12 +194,11 @@ async function loadStations() {
 
       stationLayer.addLayer(pin);
     });
-    // END MAPSTUFF
 
+    // list
     const list = document.getElementById("stations");
     list.innerHTML = "";
 
-    // ADDED
     const matching = [];
     const others = [];
 
@@ -212,6 +212,7 @@ async function loadStations() {
 
     const hasGenres = genres.length > 0;
 
+    // headers for list
     if (!hasGenres) {
       const header = document.createElement("li");
       header.className = "section-header";
@@ -268,6 +269,7 @@ async function loadStations() {
   }
 }
 
+// auto generate live location coordinates
 function useLiveLocation() {
   if (!navigator.geolocation) {
     alert("Geolocation is not supported by your browser");
@@ -279,14 +281,13 @@ function useLiveLocation() {
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
 
-      // MAPSTUFF
       initMap(
         lat,
         lon,
         parseFloat(document.getElementById("radius").value) || 50
       );
 
-      // Fill inputs so user can see values
+      // fill inputs so user can see values
       document.getElementById("lat").value = lat;
       document.getElementById("lon").value = lon;
     },
@@ -297,6 +298,7 @@ function useLiveLocation() {
   );
 }
 
+// format the station list items nicely
 function renderStation(station) {
   const list = document.getElementById("stations");
   const li = document.createElement("li");
@@ -305,7 +307,7 @@ function renderStation(station) {
   li.dataset.stationId = stationId;
   listItemById.set(stationId, li);
 
-  /* ---------- List → Map interaction ---------- */
+  // list > map interaction
   li.addEventListener("click", () => {
     if (selectedStationId === stationId) {
       clearSelection();
@@ -325,20 +327,20 @@ function renderStation(station) {
     }
   });
 
-  /* ---------- Row layout ---------- */
+  // row layout
   li.style.display = "flex";
   li.style.alignItems = "center";
   li.style.justifyContent = "space-between";
   li.style.padding = "10px 6px";
   li.style.cursor = "pointer";
 
-  /* ---------- Left side ---------- */
+  // left side
   const left = document.createElement("div");
   left.style.display = "flex";
   left.style.alignItems = "center";
   left.style.gap = "10px";
 
-  /* ---------- Favicon ---------- */
+  // favicon
   const img = document.createElement("img");
   img.src = station.favicon || "default_radio.png";
   img.onerror = () => (img.src = "default_radio.png");
@@ -351,13 +353,13 @@ function renderStation(station) {
 
   left.appendChild(img);
 
-  /* ---------- Text stack ---------- */
+  // text stack
   const text = document.createElement("div");
   text.style.display = "flex";
   text.style.flexDirection = "column";
   text.style.gap = "2px";
 
-  /* ---------- Station name (ONLY clickable link) ---------- */
+  // linked station name
   const name = document.createElement("a");
   name.textContent = station.name;
   name.href = station.url;
@@ -377,12 +379,12 @@ function renderStation(station) {
     name.style.textDecoration = "none";
   });
 
-  // 🔑 prevent map interaction
+  // prevent map interaction
   name.addEventListener("click", (e) => {
     e.stopPropagation();
   });
 
-  /* ---------- Meta ---------- */
+  // metadata
   const meta = document.createElement("div");
   meta.style.fontSize = "0.75rem";
   meta.style.color = "#6b7280";
@@ -397,7 +399,7 @@ function renderStation(station) {
   text.appendChild(meta);
   left.appendChild(text);
 
-  /* ---------- Distance (RIGHT SIDE) ---------- */
+  // distance (right side)
   const distance = document.createElement("div");
   distance.className = "station-distance";
   distance.textContent = `${station.distanceMiles.toFixed(1)} mi`;
@@ -411,20 +413,40 @@ function renderStation(station) {
   list.appendChild(li);
 }
 
-
+// receive coordinates and radius values
 document.addEventListener("DOMContentLoaded", () => {
   const lat = parseFloat(document.getElementById("lat").value);
   const lon = parseFloat(document.getElementById("lon").value);
   const radius = parseFloat(document.getElementById("radius").value) || 50;
 
+  // launch map
   initMap(lat, lon, radius);
 });
 
+// empty list message
 showEmptyMessage();
 
-document.getElementById("search").addEventListener("click", loadStations);
+// handle genre chip selection and UI state
+document.querySelectorAll(".genre-chip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    const genre = chip.dataset.genre;
+
+    if (selectedGenres.has(genre)) {
+      selectedGenres.delete(genre);
+      chip.classList.remove("active");
+    } else {
+      selectedGenres.add(genre);
+      chip.classList.add("active");
+    }
+  });
+});
+
+// handle "Use Current Location" button activity
 document
   .getElementById("live-location")
   .addEventListener("click", useLiveLocation);
+
+// handle "Find" button activity
+document.getElementById("search").addEventListener("click", loadStations);
 
   

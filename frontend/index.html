@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Station Finder</title>
+
+    <!-- Dependencies -->
     <link rel="stylesheet" href="styles.css">
 
     <link
@@ -12,76 +17,88 @@
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       defer
     ></script>
+
+    <script src="script.js" defer></script>
   </head>
   <body>
+    <!-- Header -->
     <header class="app-header">
       <h1>Radio Station Finder</h1>
     </header>
 
-    <div class="location-bar">
-      <div class="location-group">
-        <label class="lat-label">Lat</label>
-        <input id="lat" type="number" step="any" value="40.7128" />
+    <!-- Main -->
+    <main>
+      <!-- Location Inputs -->
+      <div class="location-bar">
+        <!-- Latitude, Longitude -->
+        <div class="location-group">
+          <label for="lat" class="lat-label">Lat</label>
+          <input id="lat" type="number" step="any" value="40.7128"/>
+        </div>
+
+        <div class="location-group">
+          <label for="lon">Lon</label>
+          <input id="lon" type="number" step="any" value="-74.0060"/>
+        </div>
+
+        <!-- Radius -->
+        <div class="location-group small">
+          <label for="radius">Radius</label>
+          <input id="radius" type="number" min="1" max="500" step="1" value="50"/>
+        </div>
+
+        <!-- "Use Current Location" Button -->
+        <button id="live-location" class="ghost-btn">
+          <svg class="loc-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="8"></circle>
+            <line x1="12" y1="2" x2="12" y2="5"></line>
+            <line x1="12" y1="19" x2="12" y2="22"></line>
+            <line x1="2" y1="12" x2="5" y2="12"></line>
+            <line x1="19" y1="12" x2="22" y2="12"></line>
+          </svg>
+          Use Current Location
+        </button>
+
+        <!-- "Find" Button -->
+        <button id="search" class="primary-btn">
+          Find
+        </button>
       </div>
 
-      <div class="location-group">
-        <label>Lon</label>
-        <input id="lon" type="number" step="any" value="-74.0060" />
+      <!-- Genre Inputs -->
+      <section class="filter-card">
+        <div class="music-label">Genre</div>
+
+        <div id="genre-chips">
+          <button class="genre-chip" data-genre="pop">Pop</button>
+          <button class="genre-chip" data-genre="rock">Rock</button>
+          <button class="genre-chip" data-genre="jazz">Jazz</button>
+          <button class="genre-chip" data-genre="classical">Classical</button>
+          <button class="genre-chip" data-genre="electronic">Electronic</button>
+          <button class="genre-chip" data-genre="hiphop">Hip Hop / R&B</button>
+          <button class="genre-chip" data-genre="country">Country</button>
+          <button class="genre-chip" data-genre="oldies">Oldies & Decades</button>
+          <button class="genre-chip" data-genre="talk">Talk / News</button>
+          <button class="genre-chip" data-genre="religious">Christian & Religious</button>
+          <button class="genre-chip" data-genre="world">World / International</button>
+          <button class="genre-chip" data-genre="ambient">Ambient / Chill</button>
+          <button class="genre-chip" data-genre="college">College / Community</button>
+        </div>
+      </section>
+
+      <!-- Panel Layout -->
+      <div class="layout">
+        <div class="left-panel">
+          <ul id="stations"></ul>
+        </div>
+
+        <div class="right-panel">
+          <div id="map"></div>
+        </div>
       </div>
+    </main>
 
-      <div class="location-group small">
-        <label>Radius</label>
-        <input id="radius" type="number" min="1" max="500" step="1" value="50" />
-      </div>
-
-      <button id="live-location" class="ghost-btn">
-        <svg class="loc-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="8"></circle>
-          <line x1="12" y1="2" x2="12" y2="5"></line>
-          <line x1="12" y1="19" x2="12" y2="22"></line>
-          <line x1="2" y1="12" x2="5" y2="12"></line>
-          <line x1="19" y1="12" x2="22" y2="12"></line>
-        </svg>
-        Use Current Location
-      </button>
-
-      <button id="search" class="primary-btn">
-        Find
-      </button>
-    </div>
-
-    <section class="filter-card">
-      <div class="music-label">Genre</div>
-
-      <div id="genre-chips">
-        <button class="genre-chip" data-genre="pop">Pop</button>
-        <button class="genre-chip" data-genre="rock">Rock</button>
-        <button class="genre-chip" data-genre="jazz">Jazz</button>
-        <button class="genre-chip" data-genre="classical">Classical</button>
-        <button class="genre-chip" data-genre="electronic">Electronic</button>
-        <button class="genre-chip" data-genre="hiphop">Hip Hop / R&B</button>
-        <button class="genre-chip" data-genre="country">Country</button>
-        <button class="genre-chip" data-genre="oldies">Oldies & Decades</button>
-        <button class="genre-chip" data-genre="talk">Talk / News</button>
-        <button class="genre-chip" data-genre="religious">Christian & Religious</button>
-        <button class="genre-chip" data-genre="world">World / International</button>
-        <button class="genre-chip" data-genre="ambient">Ambient / Chill</button>
-        <button class="genre-chip" data-genre="college">College / Community</button>
-      </div>
-    </section>
-
-    <div class="layout">
-      <div class="left-panel">
-        <ul id="stations"></ul>
-      </div>
-
-      <div class="right-panel">
-        <div id="map"></div>
-      </div>
-    </div>
-
-    <div class="list-footer"></div>
-
-    <script src="script.js" defer></script>
+    <!-- Footer -->
+    <footer class="list-footer"></footer>
   </body>
 </html>
