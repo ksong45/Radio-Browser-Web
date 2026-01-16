@@ -1,6 +1,9 @@
 # Radio Browser Web
 
-> Find radio stations near you.
+> An interactive web app for discovering nearby radio stations by location and genre.
+
+Radio Browser Web is a lightweight, end-to-end system that helps users explore local radio stations anywhere in the world.  
+It combines geolocation, map-based visualization, and real-time filtering to make radio discovery intuitive and visual.
 
 ## Demo
 (placeholder – screenshots / gif will go here)
