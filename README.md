@@ -60,21 +60,36 @@ It combines geolocation, map-based visualization, and real-time filtering to mak
 
 ## Getting Started
 
+You can either try the live demo (once deployed) or run the project locally.
+
 ### Prerequisites
-- 
+- Node.js (v18+ recommended)
+- A modern web browser (Chrome, Edge, Firefox)
 
 ### Installation
 ```bash
-# commands go here
+git clone https://github.com/<your-username>/Radio-Browser-Web.git
+cd Radio-Browser-Web
+npm install
 ```
 
 ### Running the App
 ```bash
-# commands go here
+# Start the backend server
+node server.js
 ```
 
+Then open `index.html` in your browser.
+
+The app will:
+- Load the frontend locally in your browser  
+- Send requests to `http://localhost:3000/stations`  
+- Fetch nearby radio stations and render them on the map and in the list
+
 ## Configuration
-(If any environment variables are needed)
+This project currently does not require any environment variables.
+
+All data is fetched from the public Radio Browser API, and the backend runs locally on port `3000` by default. The system is intentionally lightweight and easy to run out of the box.
 
 ## Roadmap
 - Deploy the app publicly (GitHub Pages + hosted backend)
