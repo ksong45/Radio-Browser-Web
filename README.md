@@ -12,10 +12,13 @@
 - 
 
 ## Tech Stack
-- 
-- 
-- 
-- 
+- Frontend: HTML, CSS, JavaScript  
+- Mapping: Leaflet.js (interactive map + markers)  
+- Backend: Node.js, Express  
+- APIs: Radio Browser API (station discovery and metadata)  
+- Browser APIs: Geolocation API (live location lookup)  
+- Data Processing: Server-side deduplication, distance sorting, and genre bucketing  
+- Hosting: Local Node server + static frontend (easily deployable to GitHub Pages / Render / Railway)
 
 ## How It Works
 - 
