@@ -68,7 +68,7 @@ You can either try the live demo (once deployed) or run the project locally.
 
 ### Installation
 ```bash
-git clone https://github.com/<your-username>/Radio-Browser-Web.git
+git clone https://github.com/ksong45/Radio-Browser-Web.git
 cd Radio-Browser-Web
 npm install
 ```
