@@ -28,10 +28,15 @@ It combines geolocation, map-based visualization, and real-time filtering to mak
 </p>
 
 ## Features
-- 
-- 
-- 
-- 
+- Location-based discovery using latitude/longitude or live browser geolocation  
+- Radius-controlled search to explore stations within any geographic range  
+- Interactive map with real-time markers for nearby stations  
+- Synchronized list and map views for intuitive spatial browsing  
+- One-click genre filtering with fast, toggleable chips  
+- Smart grouping of results into “Matching” and “Other Nearby Stations”  
+- Distance-aware sorting so closer stations surface first  
+- Clean, app-style interface optimized for exploration  
+- Direct links to live station streams
 
 ## Tech Stack
 - Frontend: HTML, CSS, JavaScript  
