@@ -86,5 +86,8 @@ It combines geolocation, map-based visualization, and real-time filtering to mak
 - Expand radio database size
 
 ## Credits
-- Radio Browser API  
-- Any libraries you want to acknowledge
+- [Radio Browser](https://www.radio-browser.info/) — open API for global radio station data  
+- [Leaflet.js](https://leafletjs.com/) — interactive mapping library  
+- [OpenStreetMap](https://www.openstreetmap.org/) — map tiles  
+- Marker icons by [pointhi/leaflet-color-markers](https://github.com/pointhi/leaflet-color-markers)  
+- Default radio icon from VeryIcon: https://www.veryicon.com/icons/miscellaneous/foundation-filling/radio-141.html?p=5
