@@ -45,9 +45,13 @@
 (If any environment variables are needed)
 
 ## Roadmap
-- 
-- 
-- 
+- Deploy the app publicly (GitHub Pages + hosted backend)
+- Add audio playback directly in the browser
+- Persist user preferences (last location, favorite genres)
+- Improve mobile layout and touch interactions
+- Add station previews and richer metadata
+- Cache recent results to reduce API calls
+- Expand radio database size
 
 ## Credits
 - Radio Browser API  
