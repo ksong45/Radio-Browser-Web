@@ -48,10 +48,15 @@ It combines geolocation, map-based visualization, and real-time filtering to mak
 - Hosting: Local Node server + static frontend (easily deployable to GitHub Pages / Render / Railway)
 
 ## How It Works
-- 
-- 
-- 
-- 
+1. The user enters a latitude/longitude and radius, or clicks “Use Current Location” to populate coordinates via the browser’s Geolocation API.
+2. The client initializes a Leaflet map, placing a center marker and drawing a radius circle to visualize the search area.
+3. When “Find” is clicked, the frontend sends a request with location and selected genres to the backend endpoint.
+4. The backend queries the Radio Browser API, deduplicates stations, computes distances, and applies genre buckets to classify matches.
+5. Results are returned in distance order and rendered in two synchronized views:
+   - A list panel with station name, location, and distance
+   - An interactive map with color-coded markers
+6. Clicking a station in the list pans and highlights its marker; clicking a marker scrolls and highlights its list entry.
+7. Genre filters dynamically partition results into “Matching” and “Other Nearby Stations” for fast exploration.
 
 ## Getting Started
 
