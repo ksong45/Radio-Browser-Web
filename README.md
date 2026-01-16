@@ -6,7 +6,26 @@ Radio Browser Web is a lightweight, end-to-end system that helps users explore l
 It combines geolocation, map-based visualization, and real-time filtering to make radio discovery intuitive and visual.
 
 ## Demo
-(placeholder – screenshots / gif will go here)
+<p align="center">
+  <img src="assets/landing.png" width="70%" />
+  <br/>
+  <em>Landing view — enter coordinates or use live location to begin discovering nearby radio stations.</em>
+</p>
+<p align="center">
+  <img src="assets/default_find.png" width="70%" />
+  <br/>
+  <em>Default results view — nearby stations are listed and mapped after a search, showing distance and location context.</em>
+</p>
+<p align="center">
+  <img src="assets/genre_filter.png" width="70%" />
+  <br/>
+  <em>Optional genre filtering — toggle one or more genres to surface stations that match your taste.</em>
+</p>
+<p align="center">
+  <img src="assets/maplist.png" width="70%" />
+  <br/>
+  <em>Synchronized map and list — selecting a station highlights it and pans the map for spatial context.</em>
+</p>
 
 ## Features
 - 
