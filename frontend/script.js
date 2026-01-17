@@ -131,7 +131,7 @@ async function loadStations() {
 
     // backend
     const response = await fetch(
-      `http://localhost:3000/stations?lat=${lat}&lon=${lon}&radius=${radius}&genres=${genreParam}`
+      `https://radio-browser-web.onrender.com/stations?lat=${lat}&lon=${lon}&radius=${radius}&genres=${genreParam}`
     );
 
     const data = await response.json();
