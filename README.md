@@ -6,6 +6,7 @@ Radio Browser Web is a lightweight, end-to-end system that helps users explore l
 It combines geolocation, map-based visualization, and real-time filtering to make radio discovery intuitive and visual.
 
 Live Demo: https://radio-browser-web-two.vercel.app/
+
 This app is hosted on a lightweight free-tier service. The first request after inactivity may take a few seconds while the server “wakes up.” Subsequent interactions should be fast.
 
 ## Demo
